@@ -180,6 +180,7 @@
     <Content Include="packages.config" />
     <Content Include="Helpers\AdaptiveCards\PairUpNotificationAdaptiveCard.json" />
     <Content Include="Helpers\AdaptiveCards\WelcomeNewMemberCard.json" />
+    <None Include="Properties\PublishProfiles\Demo-CheckIn-Bot - Web Deploy.pubxml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -196,9 +197,7 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Properties\PublishProfiles\" />
-  </ItemGroup>
+  <ItemGroup />
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
