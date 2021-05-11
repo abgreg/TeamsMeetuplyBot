@@ -72,10 +72,10 @@
             var teamsPerson2 = pair.Item2.AsTeamsChannelAccount();
 
             // Fill in person1's info in the card for person2
-            var cardForPerson2 = PairUpNotificationAdaptiveCard.GetCard(teamName, teamsPerson1.Name, teamsPerson1.GivenName, teamsPerson2.GivenName, teamsPerson1.UserPrincipalName);
+            var cardForPerson2 = TacoMoodAdaptiveCard.GetCard(teamsPerson2.GivenName);
 
             // Fill in person2's info in the card for person1
-            var cardForPerson1 = PairUpNotificationAdaptiveCard.GetCard(teamName, teamsPerson2.Name, teamsPerson2.GivenName, teamsPerson1.GivenName, teamsPerson2.UserPrincipalName);
+            var cardForPerson1 = TacoMoodAdaptiveCard.GetCard(teamsPerson1.GivenName);
 
             await NotifyUser(serviceUrl, cardForPerson1, teamsPerson1, tenantId);
             await NotifyUser(serviceUrl, cardForPerson2, teamsPerson2, tenantId);
