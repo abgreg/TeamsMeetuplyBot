@@ -23,6 +23,20 @@
             }
         }
 
+        public static async Task<TacoMoodInfo> SaveUserTacoMood(TacoMoodInfo mood)
+		{
+            InitDatabase();
+
+            var databaseName = CloudConfigurationManager.GetSetting("CosmosDBDatabaseName");
+            var collectionName = CloudConfigurationManager.GetSetting("CosmosCollectionTacoMood");
+
+            var response = await documentClient.UpsertDocumentAsync(
+                UriFactory.CreateDocumentCollectionUri(databaseName, collectionName),
+                mood);
+
+            return mood;
+        }
+
 
         public static async Task<TeamInstallInfo> SaveTeamInstallStatus(TeamInstallInfo team, bool installed)
         {
