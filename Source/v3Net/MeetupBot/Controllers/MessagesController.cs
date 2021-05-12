@@ -81,7 +81,7 @@
 						{
                             // Let the application layer handle this.
                             var teamsChannelData = activity.GetChannelData<TeamsChannelData>();
-                            await MeetupBot.SendTeamSummary(teamsChannelData.Team.Id);
+                            await MeetupBot.SendTeamSummary(teamsChannelData.Team.Id, teamsChannelData.Channel.Id);
                             return Request.CreateResponse(HttpStatusCode.OK);
                         }
                         catch (Exception)

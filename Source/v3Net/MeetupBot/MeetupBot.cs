@@ -160,7 +160,42 @@
             }
         }
 
-        public static async Task SendTeamSummary(string teamId)
+        public static async Task NotifyChannel(string serviceUrl, string cardToSend, string channelId)
+        {
+            MicrosoftAppCredentials.TrustServiceUrl(serviceUrl);
+
+            using (var connectorClient = new ConnectorClient(new Uri(serviceUrl)))
+            {
+                // construct the activity we want to post
+                var activity = new Activity()
+                {
+                    Type = ActivityTypes.Message,
+                    Attachments = new List<Attachment>()
+                    {
+                        new Attachment()
+                        {
+                            ContentType = "application/vnd.microsoft.card.adaptive",
+                            Content = JsonConvert.DeserializeObject(cardToSend),
+                        }
+                    }
+                };
+
+                var conversationParameters = new ConversationParameters
+                {
+                    IsGroup = true,
+                    ChannelData = new TeamsChannelData
+                    {
+                        Channel = new ChannelInfo(channelId)
+                    },
+                    Activity = activity
+                };
+
+                // ensure conversation exists
+                await connectorClient.Conversations.CreateConversationAsync(conversationParameters);
+            }
+        }
+
+        public static async Task SendTeamSummary(string teamId, string channelId)
 		{
             var teams = MeetupBotDataProvider.GetInstalledTeams();
             var team = teams.First(x => x.Id == teamId);
@@ -173,7 +208,7 @@
             var sadtacos = dailymoods.Where(x => x.Mood == "sad").Count();
 
             var card = SummaryCard.GetCard(responseCount.ToString(), happytacos.ToString(), sadtacos.ToString());
-            // Send this card to the channel, right?
+            await NotifyChannel(team.ServiceUrl, card, channelId);
         }
 
         public static async Task SaveAddedToTeam(string serviceUrl, string teamId, string tenantId)
