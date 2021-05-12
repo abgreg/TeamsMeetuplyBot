@@ -14,7 +14,7 @@
 
     public static class MeetupBot
     {
-        public static async Task<int> MakePairsAndNotify()
+        public static async Task<int> Notify()
         {
             // Recall all the teams where we have been added
             // For each team where I have been added:
@@ -34,15 +34,14 @@
             {
                 try
                 {
-                    var optedInUsers = await GetOptedInUsers(team);
+                    //var optedInUsers = await GetOptedInUsers(team);
 
                     var teamName = await GetTeamNameAsync(team.ServiceUrl, team.TeamId);
 
-                    foreach (var pair in MakePairs(optedInUsers).Take(maxPairUpsPerTeam))
+                    var members = await GetTeamMembers(team.ServiceUrl, team.TeamId, team.TenantId);
+                    foreach (var member in members)
                     {
-                        await NotifyPair(team.ServiceUrl, team.TenantId, teamName, pair);
-
-                        countPairsNotified++;
+                        await NotifyPerson(team.ServiceUrl, team.TenantId, teamName, member);
                     }
                 }
                 catch (UnauthorizedAccessException uae)
@@ -64,6 +63,15 @@
                 var teamDetailsResult = await teamsConnectorClient.Teams.FetchTeamDetailsAsync(teamId);
                 return teamDetailsResult.Name;
             }
+        }
+
+        private static async Task NotifyPerson(string serviceUrl, string tenantId, string teamName, ChannelAccount user)
+        {
+            var person = user.AsTeamsChannelAccount();
+
+            var card = TacoMoodAdaptiveCard.GetCard(person.GivenName);
+
+            await NotifyUser(serviceUrl, card, person, tenantId);
         }
 
         private static async Task NotifyPair(string serviceUrl, string tenantId, string teamName, Tuple<ChannelAccount, ChannelAccount> pair)

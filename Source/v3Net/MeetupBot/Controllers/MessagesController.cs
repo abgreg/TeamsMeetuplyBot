@@ -49,6 +49,24 @@
                     {
                         replyText = Resources.IDontKnow;
                     }
+
+                    if (activity.Value != null && ((dynamic)activity.Value).mood != null)
+                    {
+                        var mood = ((dynamic)activity.Value).mood.ToString();
+                        // TODO: Save the response
+                        if (mood == "happy")
+                        {
+                            replyText = "We love to see a happy taco. Have a great day! 🌮🙌";
+                        }
+                        else if (mood == "sad")
+                        {
+                            replyText = "Aw no... we all have those days. Hang in there! ❤️🥺";
+                        }
+                        else
+                        {
+                            replyText = Resources.IDontKnow;
+                        }
+                    }
                 }
                 catch (Exception ex)
                 {
