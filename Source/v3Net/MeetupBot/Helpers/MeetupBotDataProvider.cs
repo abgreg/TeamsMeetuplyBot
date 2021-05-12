@@ -37,6 +37,27 @@
             return mood;
         }
 
+        public static List<TacoMoodInfo> GetTodaysTacoMoods(string tenantId)
+        {
+            InitDatabase();
+
+            var databaseName = CloudConfigurationManager.GetSetting("CosmosDBDatabaseName");
+            var collectionName = CloudConfigurationManager.GetSetting("CosmosCollectionTacoMood");
+
+            // Set some common query options
+            FeedOptions queryOptions = new FeedOptions { MaxItemCount = -1 };
+
+            var cutoff = DateTimeOffset.Now.AddHours(-24); // Look back on 24 hours of responses.
+
+            // Find matching activities
+            var lookupQuery = documentClient.CreateDocumentQuery<TacoMoodInfo>(
+                UriFactory.CreateDocumentCollectionUri(databaseName, collectionName), queryOptions)
+                .Where(f => f.TenantId == tenantId && f.Date >= cutoff);
+
+            var match = lookupQuery.ToList();
+
+            return match;
+        }
 
         public static async Task<TeamInstallInfo> SaveTeamInstallStatus(TeamInstallInfo team, bool installed)
         {
