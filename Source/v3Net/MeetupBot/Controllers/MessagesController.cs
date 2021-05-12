@@ -77,8 +77,17 @@
                     }
                     else if (activity.Text.Contains("<at>DemoBot</at> How's everyone doing today?"))
                     {
-                        // TODO: Fetch the responses
-                        replyText = "My robot brain doesn't know how to handle that yet... try asking later!";
+                        try
+						{
+                            // Let the application layer handle this.
+                            var teamsChannelData = activity.GetChannelData<TeamsChannelData>();
+                            await MeetupBot.SendTeamSummary(teamsChannelData.Team.Id);
+                            return Request.CreateResponse(HttpStatusCode.OK);
+                        }
+                        catch (Exception)
+						{
+                            replyText = "My robot brain doesn't know how to handle that yet... try asking later!";
+                        }
                     }
                     else
                     {

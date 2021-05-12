@@ -37,7 +37,7 @@
             return mood;
         }
 
-        public static List<TacoMoodInfo> GetTodaysTacoMoodsForUsers(string tenantId, string[] users)
+        public static List<TacoMoodInfo> GetTodaysTacoMoodsForUsers(string tenantId, IEnumerable<string> users)
         {
             InitDatabase();
 

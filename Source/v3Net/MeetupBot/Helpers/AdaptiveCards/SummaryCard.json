@@ -1,0 +1,50 @@
+﻿{
+  "type": "AdaptiveCard",
+  "body": [
+    {
+      "type": "Container",
+      "items": [
+        {
+          "type": "TextBlock",
+          "size": "Medium",
+          "weight": "Bolder",
+          "text": "🌮🌮🌮 TACO SUMMARY 🌮🌮🌮"
+        }
+      ]
+    },
+    {
+      "type": "Container",
+      "items": [
+        {
+          "type": "TextBlock",
+          "text": "Here's your report from %responseCount% responses.",
+          "wrap": true
+        }
+      ]
+    },
+    {
+      "type": "Container",
+      "items": [
+        {
+          "type": "TextBlock",
+          "text": "Happy Tacos: %happytacos%",
+          "wrap": true,
+          "size": "Medium"
+        }
+      ]
+    },
+    {
+      "type": "Container",
+      "items": [
+        {
+          "type": "TextBlock",
+          "text": "Sad Tacos: %sadtacos%",
+          "wrap": true,
+          "size": "Medium"
+        }
+      ]
+    }
+  ],
+  "version": "1.3",
+  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json"
+}

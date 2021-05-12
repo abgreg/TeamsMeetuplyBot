@@ -160,6 +160,22 @@
             }
         }
 
+        public static async Task SendTeamSummary(string teamId)
+		{
+            var teams = MeetupBotDataProvider.GetInstalledTeams();
+            var team = teams.First(x => x.Id == teamId);
+            var members = await GetTeamMembers(team.ServiceUrl, team.TeamId, team.TenantId);
+            var userIds = new List<TeamsChannelAccount>(members).Select(x => x.Id);
+
+            var dailymoods = MeetupBotDataProvider.GetTodaysTacoMoodsForUsers(team.TenantId, userIds);
+            var responseCount = dailymoods.Count;
+            var happytacos = dailymoods.Where(x => x.Mood == "happy").Count();
+            var sadtacos = dailymoods.Where(x => x.Mood == "sad").Count();
+
+            var card = SummaryCard.GetCard(responseCount.ToString(), happytacos.ToString(), sadtacos.ToString());
+            // Send this card to the channel, right?
+        }
+
         public static async Task SaveAddedToTeam(string serviceUrl, string teamId, string tenantId)
         {
             await MeetupBotDataProvider.SaveTeamInstallStatus(new TeamInstallInfo() { ServiceUrl = serviceUrl, TeamId = teamId, TenantId = tenantId }, true);
