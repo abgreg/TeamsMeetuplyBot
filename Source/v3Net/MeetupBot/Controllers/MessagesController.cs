@@ -67,6 +67,15 @@
                             replyText = Resources.IDontKnow;
                         }
                     }
+                    else if (activity.Text.Contains("<at>DemoBot</at> How's everyone doing today?"))
+                    {
+                        // TODO: Fetch the responses
+                        replyText = "My robot brain doesn't know how to handle that yet... try asking later!";
+                    }
+                    else
+                    {
+                        replyText = Resources.IDontKnow;
+                    }
                 }
                 catch (Exception ex)
                 {
