@@ -41,7 +41,7 @@
                     var members = await GetTeamMembers(team.ServiceUrl, team.TeamId, team.TenantId);
                     foreach (var member in members)
                     {
-                        await NotifyPerson(team.ServiceUrl, team.TenantId, team.TeamId, member);
+                        await NotifyPerson(team.ServiceUrl, team.TenantId, teamName, member);
                     }
                 }
                 catch (UnauthorizedAccessException uae)
@@ -65,11 +65,11 @@
             }
         }
 
-        private static async Task NotifyPerson(string serviceUrl, string tenantId, string teamId, ChannelAccount user)
+        private static async Task NotifyPerson(string serviceUrl, string tenantId, string teamName, ChannelAccount user)
         {
             var person = user.AsTeamsChannelAccount();
 
-            var card = TacoMoodAdaptiveCard.GetCard(person.GivenName, teamId);
+            var card = TacoMoodAdaptiveCard.GetCard(person.GivenName);
 
             await NotifyUser(serviceUrl, card, person, tenantId);
         }

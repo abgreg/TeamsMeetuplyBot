@@ -37,7 +37,7 @@
             return mood;
         }
 
-        public static List<TacoMoodInfo> GetTodaysTacoMoods(string tenantId, string teamId)
+        public static List<TacoMoodInfo> GetTodaysTacoMoodsForUsers(string tenantId, string[] users)
         {
             InitDatabase();
 
@@ -47,12 +47,12 @@
             // Set some common query options
             FeedOptions queryOptions = new FeedOptions { MaxItemCount = -1 };
 
-            var cutoff = DateTimeOffset.Now.AddHours(-24); // Look back on 24 hours of responses.
+            var cutoff = DateTimeOffset.UtcNow.AddHours(-24); // Look back on 24 hours of responses.
 
             // Find matching activities
             var lookupQuery = documentClient.CreateDocumentQuery<TacoMoodInfo>(
                 UriFactory.CreateDocumentCollectionUri(databaseName, collectionName), queryOptions)
-                .Where(f => f.TenantId == tenantId && f.TeamId == teamId && f.Date >= cutoff);
+                .Where(f => f.TenantId == tenantId && users.Contains(f.UserId) && f.Date >= cutoff);
 
             var match = lookupQuery.ToList();
 

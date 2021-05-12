@@ -35,8 +35,7 @@
                 "type": "Action.Submit",
                 "title": "Taco Mood",
                 "data": {
-                  "mood": "happy",
-                  "teamId": "%teamId%"
+                  "mood": "happy"
                 }
               }
             }
@@ -56,8 +55,7 @@
                 "type": "Action.Submit",
                 "title": "Taco Mood",
                 "data": {
-                  "mood": "sad",
-                  "teamId": "%teamId%"
+                  "mood": "sad"
                 }
               }
             }

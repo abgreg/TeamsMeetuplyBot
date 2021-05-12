@@ -6,7 +6,8 @@
     using System.Net.Http;
     using System.Threading.Tasks;
     using System.Web.Http;
-    using Microsoft.Bot.Connector;
+	using global::MeetupBot.Helpers;
+	using Microsoft.Bot.Connector;
     using Microsoft.Bot.Connector.Teams;
     using Microsoft.Bot.Connector.Teams.Models;
     using Properties;  
@@ -53,7 +54,14 @@
                     if (activity.Value != null && ((dynamic)activity.Value).mood != null)
                     {
                         var mood = ((dynamic)activity.Value).mood.ToString();
-                        // TODO: Save the response
+                        var tacomood = new TacoMoodInfo
+                        {
+                            TenantId = activity.From.AsTeamsChannelAccount().Properties["tenantId"].ToString(),
+                            UserId = senderAadId,
+                            Date = DateTimeOffset.UtcNow,
+                            Mood = mood
+                        };
+                        await MeetupBotDataProvider.SaveUserTacoMood(tacomood);
                         if (mood == "happy")
                         {
                             replyText = "We love to see a happy taco. Have a great day! 🌮🙌";
