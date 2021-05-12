@@ -6,11 +6,12 @@
 
     public static class TacoMoodAdaptiveCard
     {
-        public static string GetCard(string receiverName)
+        public static string GetCard(string receiverName, string teamId)
         {
             var variablesToValues = new Dictionary<string, string>()
             {
-                { "receiverName", receiverName }
+                { "receiverName", receiverName },
+                { "teamId", teamId }
             };
 
             var cardJsonFilePath = HostingEnvironment.MapPath("~/Helpers/AdaptiveCards/TacoMoodAdaptiveCard.json");

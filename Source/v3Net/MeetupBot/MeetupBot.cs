@@ -41,7 +41,7 @@
                     var members = await GetTeamMembers(team.ServiceUrl, team.TeamId, team.TenantId);
                     foreach (var member in members)
                     {
-                        await NotifyPerson(team.ServiceUrl, team.TenantId, teamName, member);
+                        await NotifyPerson(team.ServiceUrl, team.TenantId, team.TeamId, member);
                     }
                 }
                 catch (UnauthorizedAccessException uae)
@@ -65,11 +65,11 @@
             }
         }
 
-        private static async Task NotifyPerson(string serviceUrl, string tenantId, string teamName, ChannelAccount user)
+        private static async Task NotifyPerson(string serviceUrl, string tenantId, string teamId, ChannelAccount user)
         {
             var person = user.AsTeamsChannelAccount();
 
-            var card = TacoMoodAdaptiveCard.GetCard(person.GivenName);
+            var card = TacoMoodAdaptiveCard.GetCard(person.GivenName, teamId);
 
             await NotifyUser(serviceUrl, card, person, tenantId);
         }
@@ -80,10 +80,10 @@
             var teamsPerson2 = pair.Item2.AsTeamsChannelAccount();
 
             // Fill in person1's info in the card for person2
-            var cardForPerson2 = TacoMoodAdaptiveCard.GetCard(teamsPerson2.GivenName);
+            var cardForPerson2 = PairUpNotificationAdaptiveCard.GetCard(teamName, teamsPerson1.Name, teamsPerson1.GivenName, teamsPerson2.GivenName, teamsPerson2.UserPrincipalName);
 
             // Fill in person2's info in the card for person1
-            var cardForPerson1 = TacoMoodAdaptiveCard.GetCard(teamsPerson1.GivenName);
+            var cardForPerson1 = PairUpNotificationAdaptiveCard.GetCard(teamName, teamsPerson2.Name, teamsPerson2.GivenName, teamsPerson1.GivenName, teamsPerson1.UserPrincipalName);
 
             await NotifyUser(serviceUrl, cardForPerson1, teamsPerson1, tenantId);
             await NotifyUser(serviceUrl, cardForPerson2, teamsPerson2, tenantId);
