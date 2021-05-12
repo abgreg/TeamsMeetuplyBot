@@ -9,6 +9,9 @@ namespace MeetupBot.Helpers
 		[JsonProperty("tenantId")]
 		public string TenantId { get; set; }
 
+		[JsonProperty("teamId")]
+		public string TeamId { get; set; }
+
 		[JsonProperty("userId")]
 		public string UserId { get; set; }
 

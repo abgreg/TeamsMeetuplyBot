@@ -37,7 +37,7 @@
             return mood;
         }
 
-        public static List<TacoMoodInfo> GetTodaysTacoMoods(string tenantId)
+        public static List<TacoMoodInfo> GetTodaysTacoMoods(string tenantId, string teamId)
         {
             InitDatabase();
 
@@ -52,7 +52,7 @@
             // Find matching activities
             var lookupQuery = documentClient.CreateDocumentQuery<TacoMoodInfo>(
                 UriFactory.CreateDocumentCollectionUri(databaseName, collectionName), queryOptions)
-                .Where(f => f.TenantId == tenantId && f.Date >= cutoff);
+                .Where(f => f.TenantId == tenantId && f.TeamId == teamId && f.Date >= cutoff);
 
             var match = lookupQuery.ToList();
 
