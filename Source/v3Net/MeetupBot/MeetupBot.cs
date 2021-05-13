@@ -34,14 +34,10 @@
             {
                 try
                 {
-                    //var optedInUsers = await GetOptedInUsers(team);
-
-                    var teamName = await GetTeamNameAsync(team.ServiceUrl, team.TeamId);
-
                     var members = await GetTeamMembers(team.ServiceUrl, team.TeamId, team.TenantId);
                     foreach (var member in members)
                     {
-                        await NotifyPerson(team.ServiceUrl, team.TenantId, teamName, member);
+                        await NotifyPerson(team.ServiceUrl, team.TenantId, member);
                     }
                 }
                 catch (UnauthorizedAccessException uae)
@@ -65,7 +61,7 @@
             }
         }
 
-        private static async Task NotifyPerson(string serviceUrl, string tenantId, string teamName, ChannelAccount user)
+        private static async Task NotifyPerson(string serviceUrl, string tenantId, ChannelAccount user)
         {
             var person = user.AsTeamsChannelAccount();
 
@@ -197,10 +193,9 @@
 
         public static async Task SendTeamSummary(string teamId, string channelId)
 		{
-            var teams = MeetupBotDataProvider.GetInstalledTeams();
-            var team = teams.First(x => x.Id == teamId);
+            var team = MeetupBotDataProvider.GetTeamInstallStatus(teamId);
             var members = await GetTeamMembers(team.ServiceUrl, team.TeamId, team.TenantId);
-            var userIds = new List<TeamsChannelAccount>(members).Select(x => x.Id);
+            var userIds = new List<TeamsChannelAccount>(members).Select(x => x.ObjectId).ToList();
 
             var dailymoods = MeetupBotDataProvider.GetTodaysTacoMoodsForUsers(team.TenantId, userIds);
             var responseCount = dailymoods.Count;

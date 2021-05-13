@@ -164,9 +164,11 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Helpers\AdaptiveCards\PairUpNotificationAdaptiveCard.cs" />
+    <Compile Include="Helpers\AdaptiveCards\SummaryCard.cs" />
     <Compile Include="Helpers\AdaptiveCards\TacoMoodAdaptiveCard.cs" />
     <Compile Include="Helpers\AdaptiveCards\WelcomeNewmemberCard.cs" />
     <Compile Include="Helpers\MeetupBotDataProvider.cs" />
+    <Compile Include="Helpers\TacoMoodInfo.cs" />
     <Compile Include="Helpers\TeamInstallInfo.cs" />
     <Compile Include="Helpers\UserOptInInfo.cs" />
     <Compile Include="MeetupBot.cs" />
@@ -182,6 +184,7 @@
     <Content Include="Helpers\AdaptiveCards\PairUpNotificationAdaptiveCard.json" />
     <Content Include="Helpers\AdaptiveCards\WelcomeNewMemberCard.json" />
     <Content Include="Helpers\AdaptiveCards\TacoMoodAdaptiveCard.json" />
+    <Content Include="Helpers\AdaptiveCards\SummaryCard.json" />
     <None Include="Properties\PublishProfiles\Demo-CheckIn-Bot - Web Deploy.pubxml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>

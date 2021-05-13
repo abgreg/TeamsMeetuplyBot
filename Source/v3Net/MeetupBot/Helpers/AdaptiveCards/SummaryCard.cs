@@ -10,7 +10,7 @@
         {
             var variablesToValues = new Dictionary<string, string>()
             {
-                { "responsesCount", responsesCount },
+                { "responseCount", responsesCount },
                 { "happytacos", happytacos },
                 { "sadtacos", sadtacos}
             };

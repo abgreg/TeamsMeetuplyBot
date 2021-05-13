@@ -56,7 +56,7 @@
                         var mood = ((dynamic)activity.Value).mood.ToString();
                         var tacomood = new TacoMoodInfo
                         {
-                            TenantId = activity.From.AsTeamsChannelAccount().Properties["tenantId"].ToString(),
+                            TenantId = activity.GetChannelData<TeamsChannelData>().Tenant.Id,
                             UserId = senderAadId,
                             Date = DateTimeOffset.UtcNow,
                             Mood = mood
@@ -75,7 +75,7 @@
                             replyText = Resources.IDontKnow;
                         }
                     }
-                    else if (activity.Text.Contains("<at>DemoBot</at> How's everyone doing today?"))
+                    else if (activity.Text.Contains("<at>Check-In Demo</at> How's everyone doing today?"))
                     {
                         try
 						{
@@ -84,7 +84,7 @@
                             await MeetupBot.SendTeamSummary(teamsChannelData.Team.Id, teamsChannelData.Channel.Id);
                             return Request.CreateResponse(HttpStatusCode.OK);
                         }
-                        catch (Exception)
+                        catch (Exception e)
 						{
                             replyText = "My robot brain doesn't know how to handle that yet... try asking later!";
                         }
