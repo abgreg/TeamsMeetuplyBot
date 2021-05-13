@@ -6,7 +6,8 @@
     using System.Net.Http;
     using System.Threading.Tasks;
     using System.Web.Http;
-    using Microsoft.Bot.Connector;
+	using global::MeetupBot.Helpers;
+	using Microsoft.Bot.Connector;
     using Microsoft.Bot.Connector.Teams;
     using Microsoft.Bot.Connector.Teams.Models;
     using Properties;  
@@ -35,15 +36,43 @@
                 {
                     var senderAadId = activity.From.AsTeamsChannelAccount().Properties["aadObjectId"].ToString();
 
-                    if (optOutRequst || string.Equals(activity.Text, "optout", StringComparison.InvariantCultureIgnoreCase))
+                    if (activity.Value != null && ((dynamic)activity.Value).mood != null)
                     {
-                        await MeetupBot.OptOutUser(activity.GetChannelData<TeamsChannelData>().Tenant.Id, senderAadId, activity.ServiceUrl);
-                        replyText = Resources.OptOutConfirmation;
+                        var mood = ((dynamic)activity.Value).mood.ToString();
+                        var tacomood = new TacoMoodInfo
+                        {
+                            TenantId = activity.GetChannelData<TeamsChannelData>().Tenant.Id,
+                            UserId = senderAadId,
+                            Date = DateTimeOffset.UtcNow,
+                            Mood = mood
+                        };
+                        await MeetupBotDataProvider.SaveUserTacoMood(tacomood);
+                        if (mood == "happy")
+                        {
+                            replyText = "We love to see a happy taco. Have a great day! 🌮🙌";
+                        }
+                        else if (mood == "sad")
+                        {
+                            replyText = "Aw no... we all have those days. Hang in there! ❤️🥺";
+                        }
+                        else
+                        {
+                            replyText = Resources.IDontKnow;
+                        }
                     }
-                    else if (string.Equals(activity.Text, "optin", StringComparison.InvariantCultureIgnoreCase))
+                    else if (activity.Text.Contains("<at>Check-In Demo</at> How's everyone doing today?"))
                     {
-                        await MeetupBot.OptInUser(activity.GetChannelData<TeamsChannelData>().Tenant.Id, senderAadId, activity.ServiceUrl);
-                        replyText = Resources.OptInConfirmation;
+                        try
+						{
+                            // Let the application layer handle this.
+                            var teamsChannelData = activity.GetChannelData<TeamsChannelData>();
+                            await MeetupBot.SendTeamSummary(teamsChannelData.Team.Id, teamsChannelData.Channel.Id);
+                            return Request.CreateResponse(HttpStatusCode.OK);
+                        }
+                        catch (Exception e)
+						{
+                            replyText = "My robot brain doesn't know how to handle that yet... try asking later!";
+                        }
                     }
                     else
                     {

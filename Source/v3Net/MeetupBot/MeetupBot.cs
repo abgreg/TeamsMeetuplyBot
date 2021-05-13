@@ -14,7 +14,7 @@
 
     public static class MeetupBot
     {
-        public static async Task<int> MakePairsAndNotify()
+        public static async Task<int> Notify()
         {
             // Recall all the teams where we have been added
             // For each team where I have been added:
@@ -34,15 +34,10 @@
             {
                 try
                 {
-                    var optedInUsers = await GetOptedInUsers(team);
-
-                    var teamName = await GetTeamNameAsync(team.ServiceUrl, team.TeamId);
-
-                    foreach (var pair in MakePairs(optedInUsers).Take(maxPairUpsPerTeam))
+                    var members = await GetTeamMembers(team.ServiceUrl, team.TeamId, team.TenantId);
+                    foreach (var member in members)
                     {
-                        await NotifyPair(team.ServiceUrl, team.TenantId, teamName, pair);
-
-                        countPairsNotified++;
+                        await NotifyPerson(team.ServiceUrl, team.TenantId, member);
                     }
                 }
                 catch (UnauthorizedAccessException uae)
@@ -66,16 +61,25 @@
             }
         }
 
+        private static async Task NotifyPerson(string serviceUrl, string tenantId, ChannelAccount user)
+        {
+            var person = user.AsTeamsChannelAccount();
+
+            var card = TacoMoodAdaptiveCard.GetCard(person.GivenName);
+
+            await NotifyUser(serviceUrl, card, person, tenantId);
+        }
+
         private static async Task NotifyPair(string serviceUrl, string tenantId, string teamName, Tuple<ChannelAccount, ChannelAccount> pair)
         {
             var teamsPerson1 = pair.Item1.AsTeamsChannelAccount();
             var teamsPerson2 = pair.Item2.AsTeamsChannelAccount();
 
             // Fill in person1's info in the card for person2
-            var cardForPerson2 = PairUpNotificationAdaptiveCard.GetCard(teamName, teamsPerson1.Name, teamsPerson1.GivenName, teamsPerson2.GivenName, teamsPerson1.UserPrincipalName);
+            var cardForPerson2 = PairUpNotificationAdaptiveCard.GetCard(teamName, teamsPerson1.Name, teamsPerson1.GivenName, teamsPerson2.GivenName, teamsPerson2.UserPrincipalName);
 
             // Fill in person2's info in the card for person1
-            var cardForPerson1 = PairUpNotificationAdaptiveCard.GetCard(teamName, teamsPerson2.Name, teamsPerson2.GivenName, teamsPerson1.GivenName, teamsPerson2.UserPrincipalName);
+            var cardForPerson1 = PairUpNotificationAdaptiveCard.GetCard(teamName, teamsPerson2.Name, teamsPerson2.GivenName, teamsPerson1.GivenName, teamsPerson1.UserPrincipalName);
 
             await NotifyUser(serviceUrl, cardForPerson1, teamsPerson1, tenantId);
             await NotifyUser(serviceUrl, cardForPerson2, teamsPerson2, tenantId);
@@ -150,6 +154,56 @@
                 }
                 
             }
+        }
+
+        public static async Task NotifyChannel(string serviceUrl, string cardToSend, string channelId)
+        {
+            MicrosoftAppCredentials.TrustServiceUrl(serviceUrl);
+
+            using (var connectorClient = new ConnectorClient(new Uri(serviceUrl)))
+            {
+                // construct the activity we want to post
+                var activity = new Activity()
+                {
+                    Type = ActivityTypes.Message,
+                    Attachments = new List<Attachment>()
+                    {
+                        new Attachment()
+                        {
+                            ContentType = "application/vnd.microsoft.card.adaptive",
+                            Content = JsonConvert.DeserializeObject(cardToSend),
+                        }
+                    }
+                };
+
+                var conversationParameters = new ConversationParameters
+                {
+                    IsGroup = true,
+                    ChannelData = new TeamsChannelData
+                    {
+                        Channel = new ChannelInfo(channelId)
+                    },
+                    Activity = activity
+                };
+
+                // ensure conversation exists
+                await connectorClient.Conversations.CreateConversationAsync(conversationParameters);
+            }
+        }
+
+        public static async Task SendTeamSummary(string teamId, string channelId)
+		{
+            var team = MeetupBotDataProvider.GetTeamInstallStatus(teamId);
+            var members = await GetTeamMembers(team.ServiceUrl, team.TeamId, team.TenantId);
+            var userIds = new List<TeamsChannelAccount>(members).Select(x => x.ObjectId).ToList();
+
+            var dailymoods = MeetupBotDataProvider.GetTodaysTacoMoodsForUsers(team.TenantId, userIds);
+            var responseCount = dailymoods.Count;
+            var happytacos = dailymoods.Where(x => x.Mood == "happy").Count();
+            var sadtacos = dailymoods.Where(x => x.Mood == "sad").Count();
+
+            var card = SummaryCard.GetCard(responseCount.ToString(), happytacos.ToString(), sadtacos.ToString());
+            await NotifyChannel(team.ServiceUrl, card, channelId);
         }
 
         public static async Task SaveAddedToTeam(string serviceUrl, string teamId, string tenantId)

@@ -23,6 +23,41 @@
             }
         }
 
+        public static async Task<TacoMoodInfo> SaveUserTacoMood(TacoMoodInfo mood)
+		{
+            InitDatabase();
+
+            var databaseName = CloudConfigurationManager.GetSetting("CosmosDBDatabaseName");
+            var collectionName = CloudConfigurationManager.GetSetting("CosmosCollectionTacoMood");
+
+            var response = await documentClient.UpsertDocumentAsync(
+                UriFactory.CreateDocumentCollectionUri(databaseName, collectionName),
+                mood);
+
+            return mood;
+        }
+
+        public static List<TacoMoodInfo> GetTodaysTacoMoodsForUsers(string tenantId, IEnumerable<string> users)
+        {
+            InitDatabase();
+
+            var databaseName = CloudConfigurationManager.GetSetting("CosmosDBDatabaseName");
+            var collectionName = CloudConfigurationManager.GetSetting("CosmosCollectionTacoMood");
+
+            // Set some common query options
+            FeedOptions queryOptions = new FeedOptions { MaxItemCount = -1 };
+
+            var cutoff = DateTimeOffset.UtcNow.AddHours(-24); // Look back on 24 hours of responses.
+
+            // Find matching activities
+            var lookupQuery = documentClient.CreateDocumentQuery<TacoMoodInfo>(
+                UriFactory.CreateDocumentCollectionUri(databaseName, collectionName), queryOptions)
+                .Where(f => f.TenantId == tenantId && users.Contains(f.UserId) && f.Date >= cutoff);
+
+            var match = lookupQuery.ToList();
+
+            return match;
+        }
 
         public static async Task<TeamInstallInfo> SaveTeamInstallStatus(TeamInstallInfo team, bool installed)
         {
@@ -77,6 +112,25 @@
             var match = lookupQuery.ToList();
 
             return match;
+        }
+
+        public static TeamInstallInfo GetTeamInstallStatus(string teamId)
+        {
+            InitDatabase();
+
+            var databaseName = CloudConfigurationManager.GetSetting("CosmosDBDatabaseName");
+            var collectionName = CloudConfigurationManager.GetSetting("CosmosCollectionTeams");
+
+            // Set some common query options
+            FeedOptions queryOptions = new FeedOptions { MaxItemCount = -1 };
+
+            var lookupQuery = documentClient.CreateDocumentQuery<TeamInstallInfo>(
+                 UriFactory.CreateDocumentCollectionUri(databaseName, collectionName), queryOptions)
+                 .Where(t => t.TeamId == teamId);
+
+            var match = lookupQuery.ToList();
+
+            return match.FirstOrDefault();
         }
 
         public static UserOptInInfo GetUserOptInStatus(string tenantId, string userId)

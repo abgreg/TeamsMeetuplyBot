@@ -25,7 +25,7 @@
 
         private static async Task<int> MakePairs()
         {
-            return await MeetupBot.MakePairsAndNotify();
+            return await MeetupBot.Notify();
         }
 
     }
