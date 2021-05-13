@@ -36,21 +36,6 @@
                 {
                     var senderAadId = activity.From.AsTeamsChannelAccount().Properties["aadObjectId"].ToString();
 
-                    if (optOutRequst || string.Equals(activity.Text, "optout", StringComparison.InvariantCultureIgnoreCase))
-                    {
-                        await MeetupBot.OptOutUser(activity.GetChannelData<TeamsChannelData>().Tenant.Id, senderAadId, activity.ServiceUrl);
-                        replyText = Resources.OptOutConfirmation;
-                    }
-                    else if (string.Equals(activity.Text, "optin", StringComparison.InvariantCultureIgnoreCase))
-                    {
-                        await MeetupBot.OptInUser(activity.GetChannelData<TeamsChannelData>().Tenant.Id, senderAadId, activity.ServiceUrl);
-                        replyText = Resources.OptInConfirmation;
-                    }
-                    else
-                    {
-                        replyText = Resources.IDontKnow;
-                    }
-
                     if (activity.Value != null && ((dynamic)activity.Value).mood != null)
                     {
                         var mood = ((dynamic)activity.Value).mood.ToString();
